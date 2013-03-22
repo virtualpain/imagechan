@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby
+
+require 'nokogiri'
+require "fileutils"
+require "open-uri"
+require 'imagechan'
+
+#  Preparation
+
+if not File.exists? Imagechan.dir
+	puts "Preparing directory"
+	Dir.mkdir(Imagechan.dir)
+end
+
+if ARGV.size == 0
+	# puts "Puts complete thread url to download"
+	# print "url: "
+	# url = STDIN.gets.chomp
+	puts <<-end
+Usage: $ imagechan <url>
+url is a complete 4chan thread url
+end
+exit(0)
+else
+	url = ARGV.first
+end
+
+if not url.match(/http:\/\/boards\.4chan\.org\/[a-z]+\/res\/[0-9]+/)
+	puts "Error: Please put a valid 4chan thread URL!"
+	exit(0)
+end
+
+category = url.scan(/([a-z]+)\/res/).first.first
+thread_id = url.scan(/res\/([0-9]+)/).first.first
+Dir.mkdir File.join(Imagechan.dir,category) if not File.exists? File.join(Imagechan.dir,category)
+
+print "Folder name: "
+dir_name = STDIN.gets.chomp.downcase
+target_dir_name = thread_id + ( dir_name.empty? ? "" : "_") + dir_name
+target_dir = File.join(Imagechan.dir,category,target_dir_name)
+Dir.mkdir(target_dir)
+
+# Let's the fun begin
+
+html_file = open(url)
+doc = Nokogiri::HTML(html_file)
+images = doc.css("a.fileThumb")
+
+puts "There are #{images.size} images"
+puts "Saving images to #{target_dir}"
+
+loop_number = 1
+images.each do |image|
+	img = "http:" + image.attr("href")
+	image_filename = img[/[0-9]+\.(jpg|png|gif)/]
+	print "#{loop_number}/#{images.size} "
+	if File.exists?(File.join(target_dir,image_filename))
+		puts "#{image_filename} exists, skipping..."
+	else
+		print "downloading #{image_filename}..."
+		File.open(File.join(target_dir,image_filename),"wb") do |save_file|
+			open(img,"rb") do |read_file|
+				save_file.write(read_file.read)
+			end
+		end
+		puts " done!"
+	end
+	loop_number += 1
+end
+
+puts "Your images save in #{target_dir}"
