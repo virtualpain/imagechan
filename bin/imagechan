@@ -18,7 +18,7 @@ if ARGV.size == 0
 	# url = STDIN.gets.chomp
 	puts <<-end
 Usage: $ imagechan <url>
-url is a complete 4chan thread url
+Where <url> is a complete 4chan thread url
 end
 exit(0)
 else
@@ -58,6 +58,8 @@ images.each do |image|
 		puts "#{image_filename} exists, skipping..."
 	else
 		print "downloading #{image_filename}..."
+
+		# Pure ruby download method
 		File.open(File.join(target_dir,image_filename),"wb") do |save_file|
 			open(img,"rb") do |read_file|
 				save_file.write(read_file.read)

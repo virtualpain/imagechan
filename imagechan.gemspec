@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = Imagechan::VERSION
   gem.authors       = ["virtualpain"]
   gem.email         = ["uehara.kikumi@gmail.com"]
-  gem.description   = %q{Downloading 4chan images}
+  gem.description   = %q{Simple 4chan image downloader command}
   gem.summary       = %q{Easily downloading 4chan images in a thread with a single command}
-  gem.homepage      = "http://eirworks.net/projects/imagechan"
+  gem.homepage      = "https://github.com/eirworks/imagechan"
   gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($/)
