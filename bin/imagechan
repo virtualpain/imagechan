@@ -35,12 +35,18 @@ thread_id = url.scan(/res\/([0-9]+)/).first.first
 Dir.mkdir File.join(Imagechan.dir,category) if not File.exists? File.join(Imagechan.dir,category)
 
 print "Folder name: "
-dir_name = STDIN.gets.chomp.downcase
+dir_name = STDIN.gets.chomp.downcase.gsub(/[^a-zA-Z0-9-\ ]/,"_").gsub(/_{2,}/,"_")
 target_dir_name = thread_id + ( dir_name.empty? ? "" : "_") + dir_name
 target_dir = File.join(Imagechan.dir,category,target_dir_name)
 Dir.mkdir(target_dir)
 
 # Let's the fun begin
+if not File.exists?(File.join(Imagechan.dir,"LOCK"))
+	File.open("LOCK",'w'){|f| f.write ""}
+else
+	puts "There are currently other download process"
+	exit(0)
+end
 
 html_file = open(url)
 doc = Nokogiri::HTML(html_file)
@@ -71,3 +77,4 @@ images.each do |image|
 end
 
 puts "Your images save in #{target_dir}"
+File.delete(File.join(Imagechan.dir,"LOCK")) if File.exists? File.join(Imagechan.dir,"LOCK")
