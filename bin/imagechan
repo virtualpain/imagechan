@@ -42,7 +42,7 @@ Dir.mkdir(target_dir)
 
 # Let's the fun begin
 if not File.exists?(File.join(Imagechan.dir,"LOCK"))
-	File.open("LOCK",'w'){|f| f.write ""}
+	File.open(File.join(Imagechan.dir,"LOCK"),'w'){|f| f.write ""}
 else
 	puts "There are currently other download process"
 	exit(0)
