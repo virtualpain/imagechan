@@ -23,4 +23,30 @@ module Imagechan
   	dir = Dir[File.join(Imagechan.dir,"*","#{id}*")].first.split(File::SEPARATOR).last
   	return dir
   end
+
+  def self.prepare
+  	puts "Preparing directory"
+	Dir.mkdir(Imagechan.dir)
+  end
+
+  def self.clearlock
+  	if File.exists?(File.join(Imagechan.dir,"LOCK"))
+  		File.delete File.join(Imagechan.dir,"LOCK") 
+  		puts "LOCK cleared!"
+  	else
+  		puts "There are nothing to unlock"
+  	end
+  end
+
+  def self.match_thread_url(url)
+  	if url.match(/http:\/\/boards\.4chan\.org\/[a-z]+\/res\/[0-9]+/)
+  		true
+  	else
+  		false
+  	end
+  end
+
+  def self.where?
+  	puts Imagechan.dir
+  end
 end
