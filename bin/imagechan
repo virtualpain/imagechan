@@ -34,11 +34,20 @@ category = url.scan(/([a-z]+)\/res/).first.first
 thread_id = url.scan(/res\/([0-9]+)/).first.first
 Dir.mkdir File.join(Imagechan.dir,category) if not File.exists? File.join(Imagechan.dir,category)
 
-print "Folder name: "
-dir_name = STDIN.gets.chomp.downcase.gsub(/[^a-zA-Z0-9-\ ]/,"_").gsub(/_{2,}/,"_")
-target_dir_name = thread_id + ( dir_name.empty? ? "" : "_") + dir_name
-target_dir = File.join(Imagechan.dir,category,target_dir_name)
-Dir.mkdir(target_dir)
+# Check if thread ID already downloaded!
+if Imagechan.id_exists?(thread_id) == false
+	print "Folder name: "
+	dir_name = STDIN.gets.chomp.downcase.gsub(/[^a-zA-Z0-9\-\ ]/,"_").gsub(/_{2,}/,"_")
+	target_dir_name = thread_id + ( dir_name.empty? ? "" : "_") + dir_name
+	target_dir = File.join(Imagechan.dir,category,target_dir_name)
+	Dir.mkdir(target_dir)
+else
+	puts "Folder with id #{thread_id} exist in #{Imagechan.get_folder_name_by_id(thread_id)}"
+	print "Continue download (y/N)? "
+	confirm = STDIN.gets.chomp.downcase
+	exit(0) if confirm.empty? or confirm == "n"
+	target_dir = File.join(Imagechan.dir,category,Imagechan.get_folder_name_by_id(thread_id))
+end
 
 # Let's the fun begin
 if not File.exists?(File.join(Imagechan.dir,"LOCK"))
