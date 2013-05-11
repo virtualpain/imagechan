@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-# require 'imagechan/version'
+require 'imagechan/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "imagechan"
-  gem.version       = "0.2.0" #Imagechan::VERSION
+  gem.version       = Imagechan::VERSION
   gem.authors       = ["virtualpain"]
   gem.email         = ["uehara.kikumi@gmail.com"]
   gem.description   = %q{Simple 4chan image downloader command}
