@@ -8,7 +8,7 @@ require "imagechan/version"
 require "imagechan/catalog"
 
 # Currently available commands
-commands = %w{catalog version clearlock where}
+commands = %w{version clearlock where}
 
 #  Preparation
 if not File.exists? Imagechan.dir
@@ -28,8 +28,6 @@ else
 	command = ARGV.first
 
 	case command
-	when "catalog"
-		Imagechan::FourChan.catalog(ARGV[1])
 	when "version"
 		puts "Version #{Imagechan.version}"
 	when "clearlock"
