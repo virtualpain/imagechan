@@ -18,9 +18,13 @@ if ARGV.size == 0
 	puts <<-end
 Usage: imagechan <command> [params]
 Commands:
-- <url>	: Download images from <url>
+- <threadurl>	: Download images from valid 4chan thread URL
 - version 	: Show current version
 - clearlock 	: Clear LOCK file
+- where 	: Show path to images
+
+example: $ imagechan http://boards.4chan.org/w/res/1515138
+will download all image from that thread
 end
 exit(0)
 else
@@ -65,13 +69,14 @@ else
 	target_dir = File.join(Imagechan.dir,category,Imagechan.get_folder_name_by_id(thread_id))
 end
 
-# Locking download for small connection
+# Locking download for slow connection
 if not File.exists?(File.join(Imagechan.dir,"LOCK"))
 	File.open(File.join(Imagechan.dir,"LOCK"),'w'){|f| f.write ""}
 else
 	puts "There are currently other download process"
 	exit(0)
 end
+
 
 # Let's the fun begin
 html_file = open(url)
@@ -82,6 +87,7 @@ puts "There are #{images.size} images"
 puts "Saving images to #{target_dir}"
 
 loop_number = 1
+
 images.each do |image|
 	img = "http:" + image.attr("href")
 	image_filename = img[/[0-9]+\.(jpg|png|gif)/]
@@ -89,18 +95,27 @@ images.each do |image|
 	if File.exists?(File.join(target_dir,image_filename))
 		puts "#{image_filename} exists, skipping..."
 	else
-		print "downloading #{image_filename}..."
+		begin
+			print "downloading #{image_filename}..."
 
-		# Pure ruby download method
-		File.open(File.join(target_dir,image_filename),"wb") do |save_file|
-			open(img,"rb") do |read_file|
-				save_file.write(read_file.read)
+			# Pure ruby download method
+			File.open(File.join(target_dir,image_filename),"wb") do |save_file|
+				open(img,"rb") do |read_file|
+					save_file.write(read_file.read)
+				end
 			end
+			puts " done!"
+		rescue Interrupt
+			puts "\nExiting..."
+			File.delete(File.join(target_dir,image_filename)) if File.exists? File.join(target_dir,image_filename)
+			puts "Removed last image to prevent error"
+			File.delete(File.join(Imagechan.dir,"LOCK")) if File.exists? File.join(Imagechan.dir,"LOCK")
+			puts "Lock removed"
+			exit(0)
 		end
-		puts " done!"
 	end
 	loop_number += 1
 end
 
-puts "Your images save in #{target_dir}"
+puts "Your images saved in #{target_dir}"
 File.delete(File.join(Imagechan.dir,"LOCK")) if File.exists? File.join(Imagechan.dir,"LOCK")
